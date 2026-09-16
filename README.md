@@ -1,50 +1,71 @@
-# Personalization Engine — DTC Platform
+# Personalization Engine
 
-A research-backed personalization engine for direct-to-consumer brands.  
-Built on **Next.js 15** (App Router) + **TypeScript**, deployed on **Render**.
+> Research-backed behavioral science personalization platform for DTC brands.
 
-## Stack
-- **Frontend**: Next.js 15 · React 19 · TypeScript
-- **Infra**: Render (Node.js web service)
-- **DB**: Supabase (Postgres + Auth)
-- **Data**: Event-driven behavioral pipeline (API-first)
+**Stack:** Next.js 15 · TypeScript · Supabase (Postgres + Auth) · Tailwind CSS · Render
 
-## Getting Started
+---
 
-```bash
-pnpm install
-pnpm dev
+## Architecture
+
+```
+src/
+├── app/
+│   ├── page.tsx                  # Landing / marketing page
+│   ├── dashboard/                # Authenticated dashboard
+│   │   ├── layout.tsx            # Sidebar nav
+│   │   ├── page.tsx              # KPI overview
+│   │   ├── lift/page.tsx         # Conversion + LTV lift analytics
+│   │   ├── events/page.tsx       # Real-time event stream
+│   │   ├── decisions/page.tsx    # Explainable AI decision log
+│   │   ├── brands/page.tsx       # Multi-tenant brand management
+│   │   └── settings/page.tsx     # Config, API keys
+│   └── api/
+│       ├── health/route.ts       # Health check endpoint
+│       ├── events/route.ts       # Behavioral event ingestion
+│       ├── decisions/route.ts    # Personalization decision log
+│       └── lift/route.ts         # Lift metrics query
+├── lib/
+│   ├── supabase/
+│   │   ├── client.ts             # Browser Supabase client
+│   │   ├── server.ts             # Server Supabase client (RSC)
+│   │   └── middleware.ts         # Auth session refresh
+│   └── utils.ts                  # cn() helper
+├── types/index.ts                # Shared TypeScript types
+└── middleware.ts                 # Next.js middleware (auth guard)
+
+supabase/
+└── migrations/
+    └── 001_initial_schema.sql    # Brands, events, decisions, lift_metrics
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/health` | Service health + Supabase connectivity |
+| POST | `/api/events` | Ingest a behavioral event |
+| GET | `/api/events` | List recent events (last 50) |
+| POST | `/api/decisions` | Log a personalization decision |
+| GET | `/api/lift?brand_id=&period=` | Query lift metrics |
 
 ## Deploy to Render
 
-The `render.yaml` in this repo wires up deployment automatically.
+1. Push to GitHub (auto-deploy on commit)
+2. In Render dashboard → New Web Service → connect `rishit-singh/personalization-engine`
+3. Set env vars: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXTAUTH_SECRET`
+4. Build: `npm install && npm run build` · Start: `npm start`
 
-1. Push to GitHub
-2. Create a new Web Service on Render → link this repo
-3. Render detects `render.yaml` and configures everything
+## Database Setup
 
-- **Build**: `pnpm install; pnpm build`
-- **Start**: `pnpm start`
-- **Port**: 10000
+Run migration against your Supabase project:
 
-## Project Structure
-
-```
-app/
-  layout.tsx        — Root layout + metadata
-  page.tsx          — Landing page (placeholder)
-  dashboard/        — (next) Analytics dashboard
-  api/              — (next) Personalization API routes
-components/         — (next) Shared UI components
-lib/                — (next) Supabase client, helpers
+```bash
+supabase db push
 ```
 
-## Roadmap
-- [ ] Supabase auth + multi-tenant setup
-- [ ] Behavioral event ingestion API
-- [ ] Personalization scoring engine
-- [ ] Dashboard with lift metrics
-- [ ] Shopify webhook integration
+Or paste `supabase/migrations/001_initial_schema.sql` into Supabase SQL editor.
+
+---
+
+Built with behavioral science. Not just behavioral data.
