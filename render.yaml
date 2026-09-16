@@ -4,20 +4,17 @@ services:
     runtime: node
     region: oregon
     plan: free
+    branch: main
     buildCommand: npm install && npm run build
     startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
-      - key: NEXT_PUBLIC_APP_URL
+      - key: NEXT_PUBLIC_SUPABASE_URL
         sync: false
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_ANON_KEY
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
-        sync: false
-      - key: NEXTAUTH_SECRET
-        generateValue: true
-      - key: NEXTAUTH_URL
         sync: false

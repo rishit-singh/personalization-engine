@@ -1,71 +1,90 @@
 # Personalization Engine
 
-> Research-backed behavioral science personalization platform for DTC brands.
+> Research-backed DTC personalization platform — behavioral science layer for conversion lift and LTV growth.
 
-**Stack:** Next.js 15 · TypeScript · Supabase (Postgres + Auth) · Tailwind CSS · Render
+## Stack
 
----
+| Layer | Tech |
+|---|---|
+| Framework | Next.js 15 (App Router) |
+| Language | TypeScript |
+| Database | Supabase (Postgres + RLS) |
+| Deployment | Render (Node, Oregon) |
+| Styling | Tailwind CSS |
 
 ## Architecture
 
 ```
-src/
-├── app/
-│   ├── page.tsx                  # Landing / marketing page
-│   ├── dashboard/                # Authenticated dashboard
-│   │   ├── layout.tsx            # Sidebar nav
-│   │   ├── page.tsx              # KPI overview
-│   │   ├── lift/page.tsx         # Conversion + LTV lift analytics
-│   │   ├── events/page.tsx       # Real-time event stream
-│   │   ├── decisions/page.tsx    # Explainable AI decision log
-│   │   ├── brands/page.tsx       # Multi-tenant brand management
-│   │   └── settings/page.tsx     # Config, API keys
-│   └── api/
-│       ├── health/route.ts       # Health check endpoint
-│       ├── events/route.ts       # Behavioral event ingestion
-│       ├── decisions/route.ts    # Personalization decision log
-│       └── lift/route.ts         # Lift metrics query
-├── lib/
-│   ├── supabase/
-│   │   ├── client.ts             # Browser Supabase client
-│   │   ├── server.ts             # Server Supabase client (RSC)
-│   │   └── middleware.ts         # Auth session refresh
-│   └── utils.ts                  # cn() helper
-├── types/index.ts                # Shared TypeScript types
-└── middleware.ts                 # Next.js middleware (auth guard)
-
-supabase/
-└── migrations/
-    └── 001_initial_schema.sql    # Brands, events, decisions, lift_metrics
+Browser / Shopify Storefront
+        │
+        ▼ POST /api/events
+┌────────────────────────┐
+│  Next.js API Routes    │  ◄── /api/health
+│  (App Router)          │  ◄── /api/personalize
+│                        │  ◄── /api/events
+└────────┬───────────────┘
+         │
+         ▼
+  Supabase Postgres
+  (behavioral_events, personalization_decisions)
+         │
+         ▼
+  Behavioral Model Layer  (coming soon: Python/FastAPI sidecar)
 ```
 
-## API Endpoints
+## Quick Start
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/health` | Service health + Supabase connectivity |
-| POST | `/api/events` | Ingest a behavioral event |
-| GET | `/api/events` | List recent events (last 50) |
-| POST | `/api/decisions` | Log a personalization decision |
-| GET | `/api/lift?brand_id=&period=` | Query lift metrics |
+```bash
+# 1. Clone
+git clone https://github.com/rishit-singh/personalization-engine.git
+cd personalization-engine
+
+# 2. Install
+npm install
+
+# 3. Environment
+cp .env.example .env.local
+# Fill in your Supabase project URL + keys
+
+# 4. Run Supabase migrations
+# via Supabase CLI: supabase db push
+# or paste supabase/migrations/001_init.sql into your SQL editor
+
+# 5. Dev
+npm run dev
+```
+
+## API Reference
+
+### `GET /api/health`
+Returns `{ status: "ok", timestamp }`.
+
+### `POST /api/events`
+```json
+{ "visitor_id": "v_123", "event_type": "page_view", "properties": {} }
+```
+
+### `POST /api/personalize`
+```json
+{ "visitor_id": "v_123", "page": "/products", "signals": {} }
+```
+Returns a `PersonalizationDecision` with recommendations and cognitive triggers.
 
 ## Deploy to Render
 
-1. Push to GitHub (auto-deploy on commit)
-2. In Render dashboard → New Web Service → connect `rishit-singh/personalization-engine`
-3. Set env vars: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXTAUTH_SECRET`
-4. Build: `npm install && npm run build` · Start: `npm start`
+1. Push this repo to GitHub
+2. In Render dashboard: **New → Web Service → Connect this repo**
+3. Render will auto-detect `render.yaml` — click **Apply**
+4. Add env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+5. Deploy 🚀
 
-## Database Setup
+Or use the `render.yaml` in this repo for one-click deploy.
 
-Run migration against your Supabase project:
+## Roadmap
 
-```bash
-supabase db push
-```
-
-Or paste `supabase/migrations/001_initial_schema.sql` into Supabase SQL editor.
-
----
-
-Built with behavioral science. Not just behavioral data.
+- [ ] Behavioral model layer (Python/FastAPI sidecar)
+- [ ] Cognitive trigger engine (loss aversion, social proof, scarcity)
+- [ ] A/B testing framework
+- [ ] Shopify webhook integration
+- [ ] Analytics dashboard
+- [ ] SDK for storefront embedding
