@@ -1,31 +1,42 @@
-export interface BehavioralEvent {
-  id?: string;
-  visitor_id: string;
-  event_type?: string;
-  page?: string;
-  signals?: Record<string, unknown>;
-  properties?: Record<string, unknown>;
-  created_at?: string;
-}
-
-export interface PersonalizationDecision {
-  visitor_id: string;
-  page: string;
-  recommendations: Recommendation[];
-  cognitive_triggers: CognitiveTrigger[];
-  confidence: number;
-}
-
-export interface Recommendation {
+export type Brand = {
   id: string;
-  type: "product" | "content" | "offer";
-  entity_id: string;
-  score: number;
-  reason: string;
-}
+  name: string;
+  plan: "pilot" | "starter" | "growth" | "enterprise";
+  created_at: string;
+};
 
-export interface CognitiveTrigger {
-  bias: string;
-  trigger: string;
-  placement: string;
-}
+export type PersonalizationEvent = {
+  id: string;
+  brand_id: string;
+  session_id: string;
+  event_type: "page_view" | "product_view" | "add_to_cart" | "purchase" | "custom";
+  properties: Record<string, unknown>;
+  behavioral_signals: {
+    recency_score: number;
+    frequency_score: number;
+    monetary_score: number;
+    cognitive_triggers: string[];
+  };
+  created_at: string;
+};
+
+export type PersonalizationDecision = {
+  id: string;
+  brand_id: string;
+  session_id: string;
+  model_version: string;
+  decision_type: "product_recommendation" | "content_variant" | "offer" | "timing";
+  decision_payload: Record<string, unknown>;
+  explanation: string;
+  confidence_score: number;
+  created_at: string;
+};
+
+export type DashboardMetrics = {
+  total_events: number;
+  decisions_served: number;
+  conversion_lift_pct: number;
+  avg_order_value_lift_pct: number;
+  ltv_improvement_pct: number;
+  active_sessions: number;
+};

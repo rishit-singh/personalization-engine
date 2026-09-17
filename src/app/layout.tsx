@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
+const inter = Inter({ subsets: ["latin"] });
+
 export const metadata: Metadata = {
-  title: "Personalization Engine",
-  description: "Research-backed DTC personalization platform",
+  title: "Personalization Engine | Research-Backed DTC Growth",
+  description:
+    "Behavioral science-powered personalization for direct-to-consumer brands. Proven 10-15% conversion lift.",
 };
 
 export default function RootLayout({
@@ -12,8 +16,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="bg-gray-50 text-gray-900 antialiased">{children}</body>
+    <html lang="en" className="dark">
+      <body className={`${inter.className} bg-zinc-950 text-zinc-100 antialiased`}>
+        {children}
+      </body>
     </html>
   );
 }

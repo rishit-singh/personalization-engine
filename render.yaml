@@ -18,3 +18,5 @@ services:
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
+      - key: PERSONALIZATION_ENGINE_VERSION
+        value: "0.1.0"

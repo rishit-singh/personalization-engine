@@ -1,90 +1,43 @@
 # Personalization Engine
 
-> Research-backed DTC personalization platform — behavioral science layer for conversion lift and LTV growth.
+> Research-backed personalization for direct-to-consumer brands.  
+> Behavioral science models · Explainable decisions · API-first · Deploys to Render in minutes.
 
 ## Stack
 
 | Layer | Tech |
 |---|---|
-| Framework | Next.js 15 (App Router) |
-| Language | TypeScript |
+| Frontend | Next.js 15 · App Router · Tailwind CSS |
+| Backend | Next.js API Routes · Zod validation |
 | Database | Supabase (Postgres + RLS) |
-| Deployment | Render (Node, Oregon) |
-| Styling | Tailwind CSS |
+| Hosting | Render (Node.js web service) |
+| Auth | Supabase Auth (SSR) |
 
-## Architecture
-
-```
-Browser / Shopify Storefront
-        │
-        ▼ POST /api/events
-┌────────────────────────┐
-│  Next.js API Routes    │  ◄── /api/health
-│  (App Router)          │  ◄── /api/personalize
-│                        │  ◄── /api/events
-└────────┬───────────────┘
-         │
-         ▼
-  Supabase Postgres
-  (behavioral_events, personalization_decisions)
-         │
-         ▼
-  Behavioral Model Layer  (coming soon: Python/FastAPI sidecar)
-```
-
-## Quick Start
+## Local Dev
 
 ```bash
-# 1. Clone
-git clone https://github.com/rishit-singh/personalization-engine.git
-cd personalization-engine
-
-# 2. Install
-npm install
-
-# 3. Environment
 cp .env.example .env.local
-# Fill in your Supabase project URL + keys
-
-# 4. Run Supabase migrations
-# via Supabase CLI: supabase db push
-# or paste supabase/migrations/001_init.sql into your SQL editor
-
-# 5. Dev
+npm install
 npm run dev
 ```
 
-## API Reference
-
-### `GET /api/health`
-Returns `{ status: "ok", timestamp }`.
-
-### `POST /api/events`
-```json
-{ "visitor_id": "v_123", "event_type": "page_view", "properties": {} }
-```
-
-### `POST /api/personalize`
-```json
-{ "visitor_id": "v_123", "page": "/products", "signals": {} }
-```
-Returns a `PersonalizationDecision` with recommendations and cognitive triggers.
-
 ## Deploy to Render
 
-1. Push this repo to GitHub
-2. In Render dashboard: **New → Web Service → Connect this repo**
-3. Render will auto-detect `render.yaml` — click **Apply**
-4. Add env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
-5. Deploy 🚀
+1. Go to render.com/dashboard
+2. New → Web Service → Connect this repo
+3. Render auto-detects render.yaml
+4. Set env vars: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
 
-Or use the `render.yaml` in this repo for one-click deploy.
+## API
+
+- POST /api/events — ingest behavioral events
+- POST /api/decisions — get personalization decision
+- GET /api/health — health check
 
 ## Roadmap
 
-- [ ] Behavioral model layer (Python/FastAPI sidecar)
-- [ ] Cognitive trigger engine (loss aversion, social proof, scarcity)
-- [ ] A/B testing framework
-- [ ] Shopify webhook integration
-- [ ] Analytics dashboard
-- [ ] SDK for storefront embedding
+- [ ] Supabase Auth flows
+- [ ] Real ML model (Python microservice)
+- [ ] Shopify webhook handler
+- [ ] A/B test management
+- [ ] Stripe billing
